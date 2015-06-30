@@ -3930,7 +3930,7 @@ build_drop_cmd(filec, filev, tabs, sendReply)
     int		sendReply;
 {
     garray_T	ga;
-    int		i;
+    int		i, len;
     char_u	*inicmd = NULL;
     char_u	*p;
     char_u	*cdp;
@@ -4016,7 +4016,12 @@ build_drop_cmd(filec, filev, tabs, sendReply)
     ga_concat(&ga, (char_u *)":if !exists('+acd')||!&acd|if haslocaldir()|");
     ga_concat(&ga, (char_u *)"cd -|lcd -|elseif getcwd() ==# \"");
     ga_concat(&ga, cdp);
-    ga_concat(&ga, (char_u *)"\"|cd -|endif|endif<CR>");
+    len=0;while(cdp[len++]);
+    if(len>3 && (char_u)'\\' == cdp[len-2] && (char_u)':' == cdp[len-3]){
+        ga_concat(&ga, (char_u *)"\\\"|cd -|endif|endif<CR>");
+    }else{
+        ga_concat(&ga, (char_u *)"\"|cd -|endif|endif<CR>");
+    }
     vim_free(cdp);
 
     if (sendReply)
